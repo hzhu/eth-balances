@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "target": "esnext",
+    "lib": ["esnext", "dom"],
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "emitDeclarationOnly": true
+  },
+  "exclude": [
+    "dist",
+    "examples",
+    "node_modules",
+    "**vitest.config.ts",
+    "./src/index.test.ts"
+  ]
+}

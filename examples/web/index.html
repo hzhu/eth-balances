@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ethereum Balances</title>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script type="module">
+      import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/5.6.9/ethers.esm.min.js";
+      import { getTokenBalances } from "./index.esm.js";
+      window.ethers = ethers;
+      window.getTokenBalances = getTokenBalances;
+    </script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script type="text/babel">
+      const { utils, providers } = ethers;
+      const { getAddress } = utils;
+      const { useState } = React;
+      const container = document.querySelector("#root");
+      const root = ReactDOM.createRoot(container);
+      const numberFormat = new Intl.NumberFormat("en-US", {
+        maximumSignificantDigits: 4,
+      });
+      const RPC_URL =
+        "https://eth-mainnet.g.alchemy.com/v2/kKnqutLMseA48OflV2pFw2krgqapTPP8";
+      const TOKEN_LIST = "https://tokens.coingecko.com/uniswap/all.json";
+      const { StaticJsonRpcProvider } = providers;
+      const provider = new StaticJsonRpcProvider(RPC_URL);
+
+      function App() {
+        const [balances, setBalances] = useState();
+        const [loading, setLoading] = useState(false);
+        const [error, setError] = useState("");
+        return (
+          <div style={{ padding: "24px" }}>
+            <button
+              disabled={balances || loading}
+              style={{ fontSize: '24px', cursor: 'pointer' }}
+              onClick={async () => {
+                setError("");
+                setLoading(true);
+                try {
+                  const response = await fetch(TOKEN_LIST);
+                  const tokenList = await response.json();
+                  const toChecksum = (token) => getAddress(token.address);
+                  const contractAddresses = tokenList.tokens.map(toChecksum);
+                  const balances = await getTokenBalances({
+                    addressOrName: "zeroex-dev.eth",
+                    contractAddresses,
+                    provider,
+                  });
+                  setBalances(balances);
+                } catch (error) {
+                  console.error(error);
+                  setError(error.message);
+                } finally {
+                  setLoading(false);
+                }
+              }}
+            >
+              {loading
+                ? "⌛ fetching for zeroex-dev.eth…"
+                : "🌐 fetch balances for zeroex-dev.eth"}
+            </button>
+            {error ? (
+              <div style={{ color: "red", marginTop: "12px" }}>{error}</div>
+            ) : null}
+            <ul style={{ padding: 0 }}>
+              {balances &&
+                Object.keys(balances).map((contractAddress) => (
+                  <li
+                    key={contractAddress}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginTop: "18px",
+                    }}
+                  >
+                    <img
+                      alt={`${balances[contractAddress].name} logo`}
+                      style={{ width: "32px", height: "32px" }}
+                      src={`https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${contractAddress}/logo.png`}
+                    />
+                    <div style={{ margin: "0 4px 0 8px" }}>
+                      {numberFormat.format(balances[contractAddress].balanceOf)}
+                    </div>
+                    <div>{balances[contractAddress].symbol}</div>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        );
+      }
+      root.render(<App />);
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
