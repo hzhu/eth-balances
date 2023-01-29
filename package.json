@@ -1,0 +1,46 @@
+{
+  "name": "@hzhu/eth-balances",
+  "version": "0.0.1",
+  "description": "Get ERC-20 balances on EVM blockchains",
+  "keywords": [
+    "evm",
+    "erc20",
+    "ethereum",
+    "blockchains",
+    "token balance"
+  ],
+  "author": "henryzhu.eth",
+  "license": "MIT",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "npm run build && cp ./dist ./public/dist",
+    "build": "npm run build:cjs && npm run build:esm && npm run types",
+    "build:esm": "esbuild src/index.ts --bundle --format=esm --outfile=dist/index.esm.js",
+    "build:cjs": "esbuild src/index.ts --bundle --platform=node --target=node10.4 --outfile=dist/index.cjs.js",
+    "types": "rm -rf ./dist/index.d.ts && tsc --emitDeclarationOnly --outDir ./dist",
+    "web:example": "npm run clean && npm run build && cp ./dist/index.esm.js ./examples/web && http-server ./examples/web --port 8000 -o",
+    "node:example": "npm run clean && npm run build:cjs && cp ./dist/index.cjs.js ./examples/node && node ./examples/node/index.js",
+    "clean": "rm -rf dist",
+    "test": "vitest --coverage"
+  },
+  "dependencies": {
+    "ethers": "^5.6.9"
+  },
+  "devDependencies": {
+    "@openzeppelin/contracts": "^4.8.0",
+    "@vitest/coverage-c8": "^0.28.3",
+    "esbuild": "^0.17.5",
+    "http-server": "^14.1.1",
+    "typescript": "^4.9.4",
+    "vitest": "^0.28.3"
+  }
+}
