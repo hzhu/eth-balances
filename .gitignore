@@ -1,0 +1,13 @@
+# dependencies
+node_modules
+
+# artifacts
+lib
+dist
+
+# example artifacts
+examples/web/index.esm.js
+examples/node/index.cjs.js
+
+# coverage files
+coverage
