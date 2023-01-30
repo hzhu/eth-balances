@@ -1,16 +1,24 @@
 {
   "name": "@hzhu/eth-balances",
   "version": "0.0.5",
-  "description": "Get ERC-20 balances on EVM blockchains",
+  "description": "A library to get ERC-20 token balances on EVM blockchains using the Multicall smart contract",
   "keywords": [
     "evm",
-    "erc20",
+    "erc-20",
     "ethereum",
     "blockchains",
     "token balance"
   ],
   "author": "henryzhu.eth",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hzhu/eth-balances"
+  },
+  "bugs": {
+    "url": "https://github.com/hzhu/eth-balances/issues"
+  },
+  "homepage": "https://github.com/hzhu/eth-balances#-eth-balances-",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
