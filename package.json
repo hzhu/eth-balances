@@ -1,6 +1,6 @@
 {
   "name": "@hzhu/eth-balances",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "Get ERC-20 balances on EVM blockchains",
   "keywords": [
     "evm",
