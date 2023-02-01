@@ -1,6 +1,6 @@
 {
   "name": "@hzhu/eth-balances",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A library to get ERC-20 token balances on EVM blockchains using the Multicall smart contract",
   "keywords": [
     "evm",
