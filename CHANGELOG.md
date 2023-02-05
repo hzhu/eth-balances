@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0](https://github.com/hzhu/eth-balances/compare/v0.0.6...v0.1.0) (2023-02-05)
+
+
+### Features
+
+* upgrade to ethers v6 ([93a4a8b](https://github.com/hzhu/eth-balances/commit/93a4a8bc1cbc0a55f2982726e7fd57bab9b81f6b))
+
 ## [0.0.6](https://github.com/hzhu/eth-balances/compare/v0.0.5...v0.0.6) (2023-02-01)
 
 
