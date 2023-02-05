@@ -12,6 +12,20 @@ import type { Provider } from "@ethersproject/providers";
 
 const MULTICALL3_CONTRACT = "0xcA11bde05977b3631167028862bE2a173976CA11";
 
+const fragmentTypes = erc20Abi.reduce<Record<string, string>>(
+  (typesByName, abiItem) => {
+    const { name, outputs } = abiItem;
+    if (outputs) {
+      return {
+        ...typesByName,
+        [name]: outputs[0].type,
+      };
+    }
+    return typesByName;
+  },
+  {}
+);
+
 interface Call {
   target: string;
   callData: string;
@@ -168,24 +182,13 @@ export function decodeMetaResults(
   metaResults: CallResult[],
   context: CallContext[]
 ): MetaByContract {
-  const fragmentTypeByName = erc20Abi.reduce<Record<string, string>>(
-    (typesByName, abiItem) => {
-      const { name, outputs } = abiItem;
-      if (outputs === undefined) return typesByName;
-      return {
-        ...typesByName,
-        [name]: outputs[0].type,
-      };
-    },
-    {}
-  );
   return metaResults.reduce((meta: BalancesByContract, result, index) => {
     let methodValue;
     const { 1: data } = result;
     const { contractAddress, methodName } = context[index];
 
     try {
-      const type = fragmentTypeByName[methodName];
+      const type = fragmentTypes[methodName];
       [methodValue] = defaultAbiCoder.decode([type], data);
     } catch (error) {
       console.info(
@@ -263,7 +266,7 @@ export async function getAddress(addressOrName: string, provider: Provider) {
 }
 
 /**
- * Returns the ERC20 balances for an Ethereum address using the 
+ * Returns the ERC20 balances for an Ethereum address using the
  * {@link https://github.com/mds1/multicall#multicall--- multicall smart contract}
  *
  * @param BalanceRequest - The request used to fetch ERC20 balances
@@ -315,7 +318,7 @@ export async function aggregate(calls: Call[], provider: Provider) {
  *
  * @param array - The array to be chunked
  * @param size - The size of each chunk
- * @returns An array of chunks 
+ * @returns An array of chunks
  */
 export function chunk<T>(array: T[], size: number) {
   const chunked: T[][] = [];
