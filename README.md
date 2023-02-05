@@ -16,8 +16,8 @@ npm install @hzhu/eth-balances
 ## Usage
 
 ```typescript
+import { JsonRpcProvider } from "ethers";
 import { getTokenBalances } from "@hzhu/eth-balances";
-import { JsonRpcProvider } from "@ethersproject/providers";
 
 const provider = new JsonRpcProvider(`https://YOUR-ETHEREUM-RPC-URL`);
 const addressOrName = "henryzhu.eth";

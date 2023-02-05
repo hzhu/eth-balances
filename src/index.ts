@@ -1,14 +1,17 @@
-import { isAddress } from "@ethersproject/address";
-import { formatUnits } from "@ethersproject/units";
-import { Contract } from "@ethersproject/contracts";
-import { HashZero } from "@ethersproject/constants";
-import { BigNumber } from "@ethersproject/bignumber";
-import { parseBytes32String } from "@ethersproject/strings";
-import { defaultAbiCoder, Interface } from "@ethersproject/abi";
+import {
+  Contract,
+  AbiCoder,
+  ZeroHash,
+  isAddress,
+  Interface,
+  formatUnits,
+  decodeBytes32String,
+} from "ethers";
 import { abi as erc20Abi } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import multicallAbi from "./abi/multicall.json";
-import type { BytesLike } from "@ethersproject/bytes";
-import type { Provider } from "@ethersproject/providers";
+import type { BytesLike, Provider } from "ethers";
+
+const coder = AbiCoder.defaultAbiCoder();
 
 const MULTICALL3_CONTRACT = "0xcA11bde05977b3631167028862bE2a173976CA11";
 
@@ -60,7 +63,7 @@ export type AssociatedCallResult = [ContractAddress, Success, ReturnData];
 
 type BlockHash = string;
 
-type AggregateResponse = [BigNumber, BlockHash, CallResult[]];
+type AggregateResponse = [bigint, BlockHash, CallResult[]];
 
 type TokenInfo = Record<
   "symbol" | "balanceOf" | "decimals" | "name",
@@ -115,8 +118,8 @@ export function getNonZeroResults(
       ...result,
     ])
     .filter(({ 2: data }) => {
-      const hasBalance = data !== HashZero;
-      const expectedFormat = data.length === HashZero.length;
+      const hasBalance = data !== ZeroHash;
+      const expectedFormat = data.length === ZeroHash.length;
       return hasBalance && expectedFormat;
     });
 }
@@ -189,12 +192,16 @@ export function decodeMetaResults(
 
     try {
       const type = fragmentTypes[methodName];
-      [methodValue] = defaultAbiCoder.decode([type], data);
+      [methodValue] = coder.decode([type], data);
     } catch (error) {
       console.info(
         `Problem decoding ${methodName} for ${contractAddress}. The contract is likely not ERC-20 compliant.`
       );
-      methodValue = parseBytes32String(data);
+      methodValue = decodeBytes32String(data);
+    }
+
+    if (methodName === "decimals") {
+      methodValue = Number(methodValue);
     }
 
     return {
@@ -223,7 +230,7 @@ export function balancesByContract(
     (balances, contractAddress) => {
       const { decimals } = metaDataByContract[contractAddress];
       const balanceHexString = balanceDataByContract[contractAddress];
-      const decoded = defaultAbiCoder.decode(["uint256"], balanceHexString);
+      const decoded = coder.decode(["uint256"], balanceHexString);
       const balance = formatUnits(decoded.toString(), decimals);
 
       return {
@@ -249,7 +256,7 @@ export async function getAddress(addressOrName: string, provider: Provider) {
   if (isAddress(addressOrName)) return addressOrName;
   const { chainId, name } = await provider.getNetwork();
 
-  if (chainId === 1) {
+  if (chainId === 1n) {
     const address = await provider.resolveName(addressOrName);
     if (address) {
       return address;
@@ -301,11 +308,15 @@ export async function getTokenBalances({
  *
  * @param calls - An array of calls that will be executed in a batch by the multicall contract (tryBlockAndAggregate)
  * @param provider - An abstraction of a connection to the EVM network which provides node functionality
- * @returns The results from tryBlockAndAggregate
+ * @returns The call results from tryBlockAndAggregate
  */
 export async function aggregate(calls: Call[], provider: Provider) {
   const contract = new Contract(MULTICALL3_CONTRACT, multicallAbi, provider);
-  const { 2: results } = (await contract.callStatic.tryBlockAndAggregate(
+  const tryBlockAndAggregate =
+    contract[
+      "tryBlockAndAggregate(bool requireSuccess, tuple(address target, bytes callData)[] calls)"
+    ];
+  const { 2: results } = (await tryBlockAndAggregate.staticCall(
     false,
     calls
   )) as AggregateResponse;

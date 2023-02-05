@@ -1,5 +1,4 @@
-const { StaticJsonRpcProvider } = require("@ethersproject/providers");
-const { getAddress } = require("@ethersproject/address");
+const { getAddress, JsonRpcProvider } = require("ethers");
 const { getTokenBalances } = require("../../dist/index.cjs");
 
 const RPC_URL =
@@ -7,7 +6,7 @@ const RPC_URL =
 const TOKEN_LIST = "https://api-polygon-tokens.polygon.technology/tokenlists/popularTokens.tokenlist.json";
 
 const main = async () => {
-  const provider = new StaticJsonRpcProvider(RPC_URL);
+  const provider = new JsonRpcProvider(RPC_URL);
   const addressOrName = "0x8a6BFCae15E729fd1440574108437dEa281A9B3e";
   const response = await fetch(TOKEN_LIST);
   const tokenList = await response.json();
