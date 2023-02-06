@@ -254,22 +254,17 @@ export function balancesByContract(
  */
 export async function getAddress(addressOrName: string, provider: Provider) {
   if (isAddress(addressOrName)) return addressOrName;
-  const { chainId, name } = await provider.getNetwork();
+  const { chainId } = await provider.getNetwork();
 
   if (chainId === 1n) {
     const address = await provider.resolveName(addressOrName);
-    if (address) {
-      return address;
-    } else {
-      throw new Error("Invalid ENS domain.");
-    }
-  } else {
-    // See: https://github.com/ethers-io/ethers.js/issues/310
-    const network = name.charAt(0).toUpperCase() + name.slice(1);
-    throw new Error(
-      `${network} does not support ENS. See https://github.com/ethers-io/ethers.js/issues/310`
-    );
+    if (address) return address;
+    throw new Error("Invalid ENS domain.");
   }
+
+  throw new Error(
+    `Chain ${chainId.toString()} does not support ENS. See https://github.com/ethers-io/ethers.js/issues/310`
+  );
 }
 
 /**
