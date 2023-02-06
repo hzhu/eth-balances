@@ -8,4 +8,4 @@ updates:
     directory: "/"
     # Check the npm registry for updates weekly (on Monday)
     schedule:
-      interval: "weekly"
+      interval: "monthly"

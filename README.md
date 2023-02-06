@@ -4,7 +4,6 @@
 [![build and test](https://github.com/hzhu/eth-balances/actions/workflows/test.yml/badge.svg)](https://github.com/hzhu/eth-balances/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/hzhu/eth-balances/branch/main/graph/badge.svg?token=OnNsoc2OrF)](https://codecov.io/gh/hzhu/eth-balances)
 
-
 A tiny library to get [ERC-20](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) token balances on EVM blockchains. It uses an aggregate function to fetch ERC20 token balances from multiple smart contracts in a single batch using the [Multicall contract](https://github.com/mds1/multicall).
 
 ## Installation
@@ -12,6 +11,8 @@ A tiny library to get [ERC-20](https://ethereum.org/en/developers/docs/standards
 ```
 npm install @hzhu/eth-balances
 ```
+
+Note: This package requires [Ethers](https://www.npmjs.com/package/ethers) to be installed in order to work.
 
 ## Usage
 
