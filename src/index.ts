@@ -12,6 +12,7 @@ import multicallAbi from "./abi/multicall.json";
 import type { BytesLike, Provider } from "ethers";
 
 const coder = AbiCoder.defaultAbiCoder();
+const erc20Interface = new Interface(erc20Abi);
 
 const MULTICALL3_CONTRACT = "0xcA11bde05977b3631167028862bE2a173976CA11";
 
@@ -90,7 +91,6 @@ export async function fetchRawBalances({
   contractAddresses,
   provider,
 }: RawBalanceRequest): Promise<AssociatedCallResult[]> {
-  const erc20Interface = new Interface(erc20Abi);
   const balanceCalls: Call[] = contractAddresses.map((contractAddress) => ({
     target: contractAddress,
     callData: erc20Interface.encodeFunctionData("balanceOf", [address]),
@@ -154,24 +154,22 @@ export function resultDataByContract(
  * @returns The calls and context
  */
 export function buildCallsContext(associatedResults: AssociatedCallResult[]) {
-  const calls: Call[] = [];
-  const context: CallContext[] = [];
   const contractAddresses = associatedResults.map((result) => result[0]);
-  const erc20Interface = new Interface(erc20Abi);
-  contractAddresses.forEach((contractAddress) => {
-    ["symbol", "decimals", "name"].forEach((methodName) => {
-      calls.push({
+  
+  return {
+    calls: contractAddresses.flatMap((contractAddress) =>
+      ["symbol", "decimals", "name"].map((methodName) => ({
         target: contractAddress,
         callData: erc20Interface.encodeFunctionData(methodName),
-      });
-      context.push({
+      }))
+    ),
+    context: contractAddresses.flatMap((contractAddress) =>
+      ["symbol", "decimals", "name"].map((methodName) => ({
         contractAddress,
         methodName,
-      });
-    });
-  });
-
-  return { calls, context };
+      }))
+    ),
+  };
 }
 
 /**
