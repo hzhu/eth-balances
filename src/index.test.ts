@@ -295,7 +295,7 @@ describe("balancesByContract", () => {
       "0xE41d2489571d322189246DaFA5ebDe1F4699F498":
         "0x0000000000000000000000000000000000000000000000027ebcbd6cf1e63a9b",
     };
-    expect(balancesByContract(decodedResults, resultDataByContract)).toEqual({
+    expect(balancesByContract(decodedResults, resultDataByContract, true)).toEqual({
       "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984": {
         symbol: "UNI",
         decimals: 18,
@@ -333,7 +333,7 @@ describe("aggregate", () => {
     ];
 
     const provider = new MockProvider({ chainId: 1, name: "ethereum" });
-    const result = await aggregate(calls, provider);
+    const result = await aggregate(calls, provider, '0xcA11bde05977b3631167028862bE2a173976CA11');
     const expected = {
       results: [
         [
@@ -393,7 +393,7 @@ describe("utilities", () => {
 
     it("returns the address when given an ENS domain", async () => {
       const mockProvider = {
-        getNetwork: async () => ({ chainId: 1n, name: "ethereum" }),
+        getNetwork: async () => ({ chainId: BigInt(1), name: "ethereum" }),
         resolveName: async () => "0x9e0543517f8e678a5c307161405cf644c2dbfbb1",
       };
       expect(
@@ -403,7 +403,7 @@ describe("utilities", () => {
 
     it.fails("throws when ENS is invalid", async () => {
       const mockProvider = {
-        getNetwork: async () => ({ chainId: 1n, name: "ethereum" }),
+        getNetwork: async () => ({ chainId: BigInt(1), name: "ethereum" }),
         resolveName: async () => null,
       };
       expect(
@@ -415,7 +415,7 @@ describe("utilities", () => {
       "throws when using a network that does not support ENS",
       async () => {
         const mockProvider = {
-          getNetwork: async () => ({ chainId: 137n, name: "matic" }),
+          getNetwork: async () => ({ chainId: BigInt(137), name: "matic" }),
           resolveName: async () => "0x9e0543517f8e678a5c307161405cf644c2dbfbb1",
         };
 
@@ -438,6 +438,7 @@ describe("fetchRawBalances", () => {
     const rawBalanceResults = await fetchRawBalances({
       address: "0x9e0543517f8e678a5c307161405cf644c2dbfbb1",
       contractAddresses,
+      multicallCustomContractAddress: '0xcA11bde05977b3631167028862bE2a173976CA11',
       provider,
     });
 
