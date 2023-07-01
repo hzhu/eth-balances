@@ -50,7 +50,7 @@
   "devDependencies": {
     "@openzeppelin/contracts": "^4.8.0",
     "@vitest/coverage-c8": "^0.31.2",
-    "esbuild": "^0.17.5",
+    "esbuild": "^0.18.10",
     "http-server": "^14.1.1",
     "typescript": "^5.0.2",
     "vitest": "^0.31.2"
